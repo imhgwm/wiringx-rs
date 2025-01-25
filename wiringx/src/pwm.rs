@@ -13,7 +13,7 @@ use crate::{Hand, WiringXError};
 /// You receive this struct from the [`WiringX::pwm_pin`](super::WiringX::pwm_pin)
 /// method of the [`WiringX`](super::WiringX) struct.
 ///
-/// Pulsing pin example for the MilkV Duo S using PWM:
+/// Pulsing pin example for pin `11` of the `MilkV Duo S using PWM`:
 /// ```
 /// use wiringx::{Platform, Polarity, WiringX};
 ///

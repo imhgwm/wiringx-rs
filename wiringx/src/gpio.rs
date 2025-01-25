@@ -49,7 +49,7 @@ impl Pin<Output> {
         unsafe { digitalWrite(self.number, value) };
     }
 
-    /// Toggles the GPIO pin to on if it was off or to on if it was off.
+    /// Toggles the GPIO pin to on if it was off or to off if it was on.
     pub fn toggle(&mut self) {
         self.write(self.read().opposite());
     }
@@ -118,8 +118,10 @@ pub struct Input;
 /// Digital voltage value of the pin.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Default)]
 pub enum Value {
+    /// Low current or "off"
     #[default]
     Low = 0,
+    /// High current or "on"
     High = 1,
 }
 
