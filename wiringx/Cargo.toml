@@ -13,3 +13,6 @@ readme = "README.md"
 parking_lot = "0.12"
 thiserror = "1.0"
 wiringx-sys = { version = "0.1", path = "../wiringx-sys"}
+
+[dev-dependencies]
+hound = "3"

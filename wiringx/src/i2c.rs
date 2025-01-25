@@ -10,7 +10,7 @@ use wiringx_sys::{
 
 use crate::{Hand, WiringXError};
 
-/// Implementations for the I2C protocol.
+/// An Inter-integrated circuit communication instance.
 #[derive(Debug)]
 pub struct I2C {
     id: (PathBuf, i32),

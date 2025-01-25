@@ -1,18 +1,24 @@
 //! Safe WiringX Rust bindings.
 
-pub mod platform;
+mod platform;
+pub use platform::*;
 
-pub mod gpio;
-pub mod i2c;
-pub mod pwm;
-pub mod spi;
-pub mod uart;
+mod gpio;
+pub use gpio::*;
 
-use i2c::I2C;
-use pwm::PwmPin;
-use spi::Spi;
+mod i2c;
+pub use i2c::*;
+
+mod pwm;
+pub use pwm::*;
+
+mod spi;
+pub use spi::*;
+
+pub use uart::*;
+mod uart;
+
 use thiserror::Error;
-use uart::{InvalidUARTConfig, SerialConfig, Uart};
 
 use std::{
     any::TypeId,
@@ -21,12 +27,11 @@ use std::{
     os::fd::RawFd,
     path::PathBuf,
     sync::{Arc, OnceLock},
+    time::Duration,
 };
 
 use parking_lot::Mutex;
 
-use gpio::{Input, Output, Pin};
-use platform::Platform;
 use wiringx_sys::{
     pinMode, pinmode_t_PINMODE_INPUT, pinmode_t_PINMODE_OUTPUT, wiringXGC, wiringXSelectableFd,
     wiringXSetup, wiringXValidGPIO,
@@ -103,7 +108,10 @@ impl WiringX {
     }
 
     /// Returns a handle to a pin marked as input or output
-    pub fn gpio_pin<State: 'static>(&self, pin_number: i32) -> Result<Pin<State>, WiringXError> {
+    pub fn gpio_pin<State: 'static + Default>(
+        &self,
+        pin_number: i32,
+    ) -> Result<Pin<State>, WiringXError> {
         if self.gpio_handles.lock().contains(&pin_number) {
             return Err(WiringXError::PinUsed);
         }
@@ -128,8 +136,20 @@ impl WiringX {
     }
 
     /// Enables and returns a handle to a PWM pin, if supported.
-    pub fn pwm_pin(&self, pin_number: i32) -> Result<PwmPin, WiringXError> {
-        PwmPin::new(pin_number, self.pwm_handles.clone())
+    pub fn pwm_pin(
+        &self,
+        pin_number: i32,
+        period: Duration,
+        duty_cycle: f32,
+        polarity: Polarity,
+    ) -> Result<PwmPin, WiringXError> {
+        PwmPin::new(
+            pin_number,
+            self.pwm_handles.clone(),
+            period,
+            duty_cycle,
+            polarity,
+        )
     }
 
     /// Sets up an I2C instance for the given I2C device path, for example `/dev/i2c-1`, and device address.
@@ -182,6 +202,9 @@ pub enum WiringXError {
     /// Gets returned if the provided config for UART is not valid.
     #[error("The provided UART config is not valid: {0}")]
     InvalidUARTConfig(InvalidUARTConfig),
+    /// Gets returned when a value is not accepted by the device.
+    #[error("Failed to write value: Invalid argument")]
+    InvalidArgument,
     /// Io os error.
     #[error("IO error: {0}")]
     Io(io::Error),

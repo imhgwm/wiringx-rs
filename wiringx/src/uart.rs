@@ -17,10 +17,27 @@ use crate::{Hand, WiringXError};
 /// Configuration of the serial connection.
 #[derive(Clone, Copy, Debug)]
 pub struct SerialConfig {
+    /// The baud rate for the serial communication, specified in bits per second (bps).
+    ///
+    /// Only allowed values are
+    /// `50`, `75`, `110`, `134`, `150`, `200`, `300`, `600`, `1200`, `1800`, `2400`, `4800`,
+    /// `9600`, `19200`, `38400`, `57600`, `115200`, or `230400`.
     pub baud_rate: u32,
+
+    /// The number of data bits in each character frame.
+    /// Allowed values are 7, 8.
     pub data_bits: u32,
+
+    /// The parity setting for error detection in the communication.
+    /// This can be `None`, `Even`, or `Odd`.
     pub parity: Parity,
+
+    /// The number of stop bits used to mark the end of a character frame.
+    /// Allowed values are 1 or 2 stop bits.
     pub stop_bits: u32,
+
+    /// The flow control setting to manage data flow between devices.
+    /// Options include `None`, or `Software` (XON/XOFF).
     pub flow_control: FlowControl,
 }
 
@@ -86,7 +103,7 @@ impl From<SerialConfig> for wiringXSerial_t {
     }
 }
 
-/// A serial UART instance.
+/// Universal asynchronous receiver/transmitter serial communication instance.
 #[derive(Debug)]
 pub struct Uart {
     fd: RawFd,

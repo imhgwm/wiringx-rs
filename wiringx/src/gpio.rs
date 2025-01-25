@@ -12,18 +12,18 @@ use crate::WiringXError;
 
 /// Representation of a GPIO pin.
 #[derive(Debug)]
-pub struct Pin<T> {
+pub struct Pin<T: Default> {
     number: i32,
     handle: Arc<Mutex<HashSet<i32>>>,
-    _mode: std::marker::PhantomData<T>,
+    mode: T,
 }
 
-impl<T> Pin<T> {
+impl<T: Default> Pin<T> {
     pub(super) fn new(number: i32, handle: Arc<Mutex<HashSet<i32>>>) -> Self {
         Self {
             number,
             handle,
-            _mode: std::marker::PhantomData,
+            mode: T::default(),
         }
     }
 
@@ -35,13 +35,20 @@ impl<T> Pin<T> {
 
 impl Pin<Output> {
     /// Writes a value to the GPIO pin.
-    pub fn write(&self, value: Value) {
+    pub fn write(&mut self, value: Value) {
+        self.mode.value = value;
+
         let value = match value {
             Value::High => digital_value_t_HIGH,
             Value::Low => digital_value_t_LOW,
         };
 
         unsafe { digitalWrite(self.number, value) };
+    }
+
+    /// Returns the current value of this GPIO pin.
+    pub fn read(&self) -> Value {
+        self.mode.value
     }
 }
 
@@ -72,7 +79,7 @@ impl Pin<Input> {
 
     /// Suspends the thread until input to this pin was detected or the function times out.
     ///
-    /// Returns Ok(()) on successful interrupt read and InterruptTimeOut on timeout.
+    /// Returns `Ok(())` on successful interrupt read and `Err(InterruptTimeOut)` on timeout.
     pub fn wait_for_interrupt(&self, timeout_dur: Duration) -> Result<(), InterruptTimeOut> {
         let result = unsafe { waitForInterrupt(self.number, timeout_dur.as_millis() as i32) };
 
@@ -84,24 +91,27 @@ impl Pin<Input> {
     }
 }
 
-impl<T> Drop for Pin<T> {
+impl<T: Default> Drop for Pin<T> {
     fn drop(&mut self) {
         self.handle.lock().remove(&self.number);
     }
 }
 
 /// Sets the pin mode to output, allowing writing to the pin value.
-#[derive(Debug, Clone, Copy)]
-pub struct Output;
+#[derive(Debug, Clone, Copy, Default)]
+pub struct Output {
+    value: Value,
+}
 
 /// Sets the pin mode to input, allowing reading the physical value.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Default)]
 pub struct Input;
 
 /// Digital voltage value of the pin.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Default)]
 pub enum Value {
     High,
+    #[default]
     Low,
 }
 

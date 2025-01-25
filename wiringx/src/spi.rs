@@ -6,7 +6,7 @@ use wiringx_sys::{wiringXSPIDataRW, wiringXSPIGetFd, wiringXSPISetup};
 
 use crate::{Hand, WiringXError};
 
-/// A SPI instance.
+/// A Serial Peripheral Interface communication instance.
 #[derive(Debug)]
 pub struct Spi {
     channel: i32,

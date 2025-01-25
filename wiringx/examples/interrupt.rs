@@ -2,11 +2,7 @@
 //!
 //! Rust replication of the official C interrupt example.
 
-use wiringx::{
-    gpio::{Input, Output, Pin, Value},
-    platform::Platform,
-    WiringX,
-};
+use wiringx::{Input, IsrMode, Output, Pin, Platform, Value, WiringX};
 
 use std::{thread, time::Duration};
 
@@ -64,10 +60,10 @@ fn main() {
     }
 
     let input_pin = wiringx.gpio_pin::<Input>(input_pin_number).unwrap();
-    let output_pin = wiringx.gpio_pin::<Output>(output_pin_number).unwrap();
+    let mut output_pin = wiringx.gpio_pin::<Output>(output_pin_number).unwrap();
 
     input_pin
-        .set_isr_mode(wiringx::gpio::IsrMode::Both)
+        .set_isr_mode(IsrMode::Both)
         .expect("Can not set given input GPIO to interrupt BOTH");
 
     let interrupt_thread = thread::spawn(|| interrupt(input_pin));
