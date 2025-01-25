@@ -173,7 +173,7 @@ impl PwmPin {
 
     /// Returns the duty cycle in form of a duration.
     pub fn duty_cycle_as_dur(&self) -> Duration {
-        self.period.mul_f32(self.duty_cycle).as_nanos()
+        self.period.mul_f32(self.duty_cycle)
     }
 
     /// Sets the polarity of the PWM pin.
