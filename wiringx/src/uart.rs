@@ -25,7 +25,7 @@ pub struct SerialConfig {
     pub baud_rate: u32,
 
     /// The number of data bits in each character frame.
-    /// Allowed values are 7, 8.
+    /// Allowed values are `7`, `8`.
     pub data_bits: u32,
 
     /// The parity setting for error detection in the communication.
@@ -33,7 +33,7 @@ pub struct SerialConfig {
     pub parity: Parity,
 
     /// The number of stop bits used to mark the end of a character frame.
-    /// Allowed values are 1 or 2 stop bits.
+    /// Allowed values are `1` or `2` stop bits.
     pub stop_bits: u32,
 
     /// The flow control setting to manage data flow between devices.

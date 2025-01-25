@@ -1,4 +1,26 @@
 //! Safe WiringX Rust bindings.
+//!
+//! Example Blinker on pin `0` for [`Milk-V Duo S`](Platform::MilkVDuoS):
+//! ```
+//! use wiringx::{Output, Platform, Value, WiringX};
+//!
+//! use std::{thread, time::Duration};
+//!
+//! fn main() {
+//!     // Replace `Platform` with your platform
+//!     let wiringx = WiringX::new(Platform::MilkVDuoS).unwrap();
+//!
+//!     // We use pin `0`, for the built in LED
+//!     let mut pin = wiringx.gpio_pin::<Output>(0).unwrap();
+//!
+//!     loop {
+//!         pin.write(Value::Low);
+//!         thread::sleep(Duration::from_secs(1));
+//!         pin.write(Value::High);
+//!         thread::sleep(Duration::from_secs(1));
+//!     }
+//! }
+//! ```
 
 mod platform;
 pub use platform::*;
@@ -41,7 +63,13 @@ static WIRINGX: OnceLock<WiringX> = OnceLock::new();
 
 type Hand<T> = Arc<Mutex<HashSet<T>>>;
 
-/// WiringX functionality.
+/// Instance of WiringXl
+///
+/// Used to register pins and interfaces to be safely used.
+///
+/// Keeps track of all pins and protocol instances.
+///
+/// Can be shared across threads safely.
 #[derive(Clone, Debug)]
 pub struct WiringX {
     platform: Platform,
@@ -54,6 +82,8 @@ pub struct WiringX {
 
 impl WiringX {
     /// Sets up WiringX for the given board.
+    ///
+    /// When called a second time, the platform argument does not do anything, because returns the first instance.
     pub fn new(platform: Platform) -> Result<&'static Self, WiringXError> {
         let error = OnceLock::new();
 

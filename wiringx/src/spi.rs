@@ -7,6 +7,9 @@ use wiringx_sys::{wiringXSPIDataRW, wiringXSPIGetFd, wiringXSPISetup};
 use crate::{Hand, WiringXError};
 
 /// A Serial Peripheral Interface communication instance.
+///
+/// You receive this struct from the [`WiringX::setup_spi`](super::WiringX::setup_spi)
+/// method of the [`WiringX`](super::WiringX) struct.
 #[derive(Debug)]
 pub struct Spi {
     channel: i32,

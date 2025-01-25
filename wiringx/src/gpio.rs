@@ -10,7 +10,10 @@ use wiringx_sys::{
 
 use crate::WiringXError;
 
-/// Representation of a GPIO pin.
+/// Representation of a GPIO, General Purpose Input Output, pin.
+///
+/// You receive this struct from the [`WiringX::gpio_pin`](super::WiringX::gpio_pin)
+/// method of the [`WiringX`](super::WiringX) struct.
 #[derive(Debug)]
 pub struct Pin<T: Default> {
     number: i32,

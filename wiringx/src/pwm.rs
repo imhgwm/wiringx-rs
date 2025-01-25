@@ -9,6 +9,38 @@ use wiringx_sys::{
 use crate::{Hand, WiringXError};
 
 /// Instance of a pulse-width modulated pin.
+///
+/// You receive this struct from the [`WiringX::pwm_pin`](super::WiringX::pwm_pin)
+/// method of the [`WiringX`](super::WiringX) struct.
+///
+/// Pulsing pin example for the MilkV Duo S using PWM:
+/// ```
+/// use wiringx::{Platform, Polarity, WiringX};
+///
+/// use std::time::{Duration, Instant};
+///
+/// fn main() {
+///     // Change Platform to yours
+///     let wiringx = WiringX::new(Platform::MilkVDuoS).unwrap();
+///
+///     let mut pwm = wiringx
+///         .pwm_pin(
+///             11,                         // pin number
+///             Duration::from_nanos(1000), // period
+///             0.0,                        // duty cycle
+///             Polarity::Normal,
+///         )
+///         .unwrap();
+///
+///     let duty_timestamp = Instant::now();
+///     loop {
+///         // 2x speed sine function with values in 0.0 - 1.0
+///         let duty = ((duty_timestamp.elapsed().as_secs_f32() * 2.0).sin() + 1.0) * 0.5;
+///
+///         pwm.set_duty_cycle(duty).unwrap()
+///     }
+/// }
+/// ```
 #[derive(Debug)]
 pub struct PwmPin {
     number: i32,
@@ -79,6 +111,19 @@ impl PwmPin {
 
     /// Sets the period of time a PWM cycle takes.
     pub fn set_period(&mut self, period: Duration) -> Result<(), WiringXError> {
+        // First set duty cycle lower
+        let result = unsafe {
+            wiringXPWMSetDuty(
+                self.number,
+                period.mul_f32(self.duty_cycle).as_nanos() as i64,
+            )
+        };
+
+        if result < 0 {
+            return Err(WiringXError::InvalidArgument);
+        }
+
+        // Next set period
         let result = unsafe { wiringXPWMSetPeriod(self.number, period.as_nanos() as i64) };
 
         if result < 0 {
@@ -124,6 +169,11 @@ impl PwmPin {
     /// Returns the duty cycle of this pin.
     pub fn duty_cycle(&self) -> f32 {
         self.duty_cycle
+    }
+
+    /// Returns the duty cycle in form of a duration.
+    pub fn duty_cycle_as_dur(&self) -> Duration {
+        self.period.mul_f32(self.duty_cycle).as_nanos()
     }
 
     /// Sets the polarity of the PWM pin.

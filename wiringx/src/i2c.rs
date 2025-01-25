@@ -11,6 +11,9 @@ use wiringx_sys::{
 use crate::{Hand, WiringXError};
 
 /// An Inter-integrated circuit communication instance.
+///
+/// You receive this object by calling
+/// [`WiringX::setup_i2c`](super::WiringX::setup_i2c) in the [`WiringX`](super::WiringX) struct.
 #[derive(Debug)]
 pub struct I2C {
     id: (PathBuf, i32),
