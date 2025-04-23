@@ -34,6 +34,7 @@ impl Spi {
     }
 
     /// Returns the raw file descriptor of this spi instance.
+    #[inline]
     pub fn get_fd(&self) -> RawFd {
         unsafe { wiringXSPIGetFd(self.channel) }
     }

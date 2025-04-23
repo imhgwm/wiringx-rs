@@ -144,11 +144,13 @@ impl Uart {
     }
 
     /// Flushes the buffer.
+    #[inline]
     pub fn flush(&self) {
         unsafe { wiringXSerialFlush(self.fd) }
     }
 
     /// Outputs a character.
+    #[inline]
     pub fn put_char(&self, character: char) {
         unsafe { wiringXSerialPutChar(self.fd, character as c_uchar) }
     }
@@ -161,11 +163,13 @@ impl Uart {
     }
 
     /// Returns the number of bytes present in the receiving buffer.
+    #[inline]
     pub fn data_available(&self) -> usize {
         unsafe { wiringXSerialDataAvail(self.fd) as usize }
     }
 
     /// Returns a character from the receiving buffer.
+    #[inline]
     pub fn read_char(&self) -> char {
         unsafe { char::from_u32_unchecked(wiringXSerialGetChar(self.fd) as u32) }
     }

@@ -131,6 +131,7 @@ impl PwmPin {
     }
 
     /// Returns the period duration of this pin.
+    #[inline]
     pub fn period(&self) -> Duration {
         self.period
     }
@@ -162,6 +163,7 @@ impl PwmPin {
     }
 
     /// Returns the duty cycle of this pin.
+    #[inline]
     pub fn duty_cycle(&self) -> f32 {
         self.duty_cycle
     }
@@ -185,6 +187,7 @@ impl PwmPin {
     }
 
     /// Returns the polarity of this pin.
+    #[inline]
     pub fn polarity(&self) -> Polarity {
         self.polarity
     }

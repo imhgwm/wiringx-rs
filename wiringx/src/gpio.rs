@@ -22,6 +22,7 @@ pub struct Pin<T: Default> {
 }
 
 impl<T: Default> Pin<T> {
+    #[inline]
     pub(super) fn new(number: i32, handle: Arc<Mutex<HashSet<i32>>>) -> Self {
         Self {
             number,
@@ -31,6 +32,7 @@ impl<T: Default> Pin<T> {
     }
 
     /// Returns the number of this pin.
+    #[inline]
     pub fn number(&self) -> i32 {
         self.number
     }
@@ -55,13 +57,14 @@ impl Pin<Output> {
     }
 
     /// Returns the current value of this GPIO pin.
+    #[inline]
     pub fn read(&self) -> Value {
         self.mode.value
     }
 }
 
 impl Pin<Input> {
-    /// Reads the state of the GPIO pin.
+    /// Reads the current state of the GPIO pin.
     pub fn read(&self) -> Value {
         let result = unsafe { digitalRead(self.number) };
 
@@ -72,7 +75,9 @@ impl Pin<Input> {
         }
     }
 
-    /// Sets the interrupt service routine mode of this pin, when to trigger using the `wait_for_interrupt` method.
+    /// Sets the interrupt service routine mode of this pin.
+    ///
+    /// This determines when to trigger the interrupt when using the `wait_for_interrupt` method.
     pub fn set_isr_mode(&self, mode: IsrMode) -> Result<(), WiringXError> {
         let result = unsafe { wiringXISR(self.number, mode as u32) };
 
@@ -126,6 +131,8 @@ pub enum Value {
 }
 
 impl Value {
+    /// Returns the opposite value, returning [`Low`](Value::Low) when [`High`](Value::High)
+    /// and vice-versa.
     pub fn opposite(&self) -> Self {
         match self {
             Self::Low => Self::High,

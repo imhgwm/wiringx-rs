@@ -57,9 +57,10 @@ use wiringx_sys::{
 
 static WIRINGX: OnceLock<WiringX> = OnceLock::new();
 
+/// A pin handle
 type Hand<T> = Arc<Mutex<HashSet<T>>>;
 
-/// Instance of WiringXl
+/// Instance of WiringX
 ///
 /// Used to register pins and interfaces to be safely used.
 ///
@@ -79,7 +80,8 @@ pub struct WiringX {
 impl WiringX {
     /// Sets up WiringX for the given board.
     ///
-    /// When called a second time, the platform argument does not do anything, because returns the first instance.
+    /// When called a second time, the platform argument does not do anything.
+    /// Instead the same instance will be returned.
     pub fn new(platform: Platform) -> Result<&'static Self, WiringXError> {
         let error = OnceLock::new();
 
@@ -107,19 +109,20 @@ impl WiringX {
         }
     }
 
-    /// Returns the platform this struct got initialized for.
+    /// Returns the WiringX platform of this instance.
+    #[inline]
     pub fn platform(&self) -> Platform {
         self.platform
     }
 
-    /// Returns true if the given GPIO number is valid for the selected platform.
+    /// Returns true if the given GPIO number is valid for this platform.
     pub fn valid_gpio(&self, gpio_pin: i32) -> bool {
         let result = unsafe { wiringXValidGPIO(gpio_pin) };
 
         result == 0
     }
 
-    /// Returns the raw file descriptor to the given GPIO pin.
+    /// Returns a raw file descriptor to the given GPIO pin.
     pub fn selectable_fd(&self, gpio_pin: i32) -> Result<RawFd, WiringXError> {
         if !self.valid_gpio(gpio_pin) {
             return Err(WiringXError::InvalidPin);
@@ -133,7 +136,7 @@ impl WiringX {
         }
     }
 
-    /// Returns a handle to a pin marked as input or output
+    /// Returns a handle to a pin marked either as [`Input`] or [`Output`]
     pub fn gpio_pin<State: 'static + Default>(
         &self,
         pin_number: i32,
@@ -161,7 +164,8 @@ impl WiringX {
         Ok(Pin::new(pin_number, self.gpio_handles.clone()))
     }
 
-    /// Enables and returns a handle to a PWM pin, if supported.
+    /// Enables and returns a handle to a pulse-width modulated pin, if supported.
+    #[inline]
     pub fn pwm_pin(
         &self,
         pin_number: i32,
@@ -178,24 +182,29 @@ impl WiringX {
         )
     }
 
-    /// Sets up an I2C instance for the given I2C device path, for example `/dev/i2c-1`, and device address.
+    /// Sets up an inter-integrated circuit instance for the given I2C device path, for example `/dev/i2c-1`, and the device address.
+    #[inline]
     pub fn setup_i2c(&self, dev: PathBuf, addr: i32) -> Result<I2C, WiringXError> {
         I2C::new(dev, addr, self.i2c_handles.clone())
     }
 
-    /// Sets up an SPI instance for the given device channel.
+    /// Sets up an serial peripheral interface instance for the given device channel.
     ///
     /// Speed is measured in Hertz here.
+    #[inline]
     pub fn setup_spi(&self, channel: i32, speed: u32) -> Result<Spi, WiringXError> {
         Spi::new(channel, speed as i32, self.spi_handles.clone())
     }
 
+    /// Sets up a universal asynchronous receiver-transmitter instance with the provided device path and configuration.
+    #[inline]
     pub fn setup_uart(&self, dev: PathBuf, config: SerialConfig) -> Result<Uart, WiringXError> {
         Uart::new(dev, config, self.uart_handles.clone())
     }
 }
 
 impl Drop for WiringX {
+    #[inline]
     fn drop(&mut self) {
         unsafe {
             wiringXGC();
