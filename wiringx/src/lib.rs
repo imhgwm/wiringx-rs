@@ -6,17 +6,15 @@
 //!
 //! use std::{thread, time::Duration};
 //!
-//! fn main() {
-//!     // Replace `Platform` with your platform
-//!     let wiringx = WiringX::new(Platform::MilkVDuoS).unwrap();
+//! // Replace `Platform` with your platform
+//! let wiringx = WiringX::new(Platform::MilkVDuoS).unwrap();
 //!
-//!     // We use pin `0`, for the built in LED
-//!     let mut pin = wiringx.gpio_pin::<Output>(0).unwrap();
+//! // We use pin `0`, for the built in LED
+//! let mut pin = wiringx.gpio_pin::<Output>(0).unwrap();
 //!
-//!     loop {
-//!         pin.toggle();
-//!         thread::sleep(Duration::from_secs(1));
-//!     }
+//! loop {
+//!  pin.toggle();
+//!  thread::sleep(Duration::from_secs(1));
 //! }
 //! ```
 

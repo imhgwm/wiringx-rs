@@ -19,26 +19,21 @@ use crate::{Hand, WiringXError};
 ///
 /// use std::time::{Duration, Instant};
 ///
-/// fn main() {
-///     // Change Platform to yours
-///     let wiringx = WiringX::new(Platform::MilkVDuoS).unwrap();
-///
-///     let mut pwm = wiringx
-///         .pwm_pin(
-///             11,                         // pin number
-///             Duration::from_nanos(1000), // period
-///             0.0,                        // duty cycle
-///             Polarity::Normal,
-///         )
-///         .unwrap();
-///
-///     let duty_timestamp = Instant::now();
-///     loop {
-///         // 2x speed sine function with values in 0.0 - 1.0
-///         let duty = ((duty_timestamp.elapsed().as_secs_f32() * 2.0).sin() + 1.0) * 0.5;
-///
-///         pwm.set_duty_cycle(duty).unwrap()
-///     }
+/// // Change Platform to yours
+/// let wiringx = WiringX::new(Platform::MilkVDuoS).unwrap();
+/// let mut pwm = wiringx
+///     .pwm_pin(
+///         11,                         // pin number
+///         Duration::from_nanos(1000), // period
+///         0.0,                        // duty cycle
+///         Polarity::Normal,
+///     )
+///     .unwrap();
+/// let duty_timestamp = Instant::now();
+/// loop {
+///     // 2x speed sine function with values in 0.0 - 1.0
+///     let duty = ((duty_timestamp.elapsed().as_secs_f32() * 2.0).sin() + 1.0) * 0.5;
+///     pwm.set_duty_cycle(duty).unwrap()
 /// }
 /// ```
 #[derive(Debug)]
