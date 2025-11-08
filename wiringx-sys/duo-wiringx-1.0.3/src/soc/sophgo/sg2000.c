@@ -292,6 +292,13 @@ static int sg2000DigitalRead(int i) {
 		return -1;
 	}
 
+	// in PinMode Output return the current output state
+	if(pin->mode == PINMODE_OUTPUT) {
+		data_reg = (volatile unsigned int *)(sg2000->gpio[pin->gpio_group] + pin->data.offset + GPIO_SWPORTA_DR);
+		val = *data_reg;
+		return (int)((val & (1 << pin->data.bit)) >> pin->data.bit);
+	}
+
 	if(pin->mode != PINMODE_INPUT) {
 		wiringXLog(LOG_ERR, "The %s %s GPIO%d is not set to input mode", sg2000->brand, sg2000->chip, i);
 		return -1;

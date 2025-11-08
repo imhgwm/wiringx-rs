@@ -59,7 +59,14 @@ impl Pin<Output> {
     /// Returns the current value of this GPIO pin.
     #[inline]
     pub fn read(&self) -> Value {
-        self.mode.value
+        // in PinMode Output return the current output state
+        let result = unsafe { digitalRead(self.number) };
+
+        if result == 1 {
+            Value::High
+        } else {
+            Value::Low
+        }
     }
 }
 
@@ -113,7 +120,7 @@ impl<T: Default> Drop for Pin<T> {
 /// Sets the pin mode to output, allowing writing to the pin value.
 #[derive(Debug, Clone, Copy, Default)]
 pub struct Output {
-    value: Value,
+     value: Value,
 }
 
 /// Sets the pin mode to input, allowing reading the physical value.
